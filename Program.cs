@@ -8,7 +8,6 @@ namespace RegistratoreCassa
     {
         static void Main(string[] args)
         {
-            var Time = DateTime.Now; 
             Console.WriteLine("Registratore di cassa esempio");
             Console.WriteLine("a fine registrazione prodotti si creerà un file tipo .txt dove alloggeranno tutti i dati raccolti");
             int NumberProducts = HowManyProducts();
@@ -16,7 +15,7 @@ namespace RegistratoreCassa
             List<float> PriceProducts = new List<float>();
             (NameProducts, PriceProducts) = ProductsSubscription(NumberProducts);
             Product InfoProduct = new Product(NameProducts, PriceProducts);
-            MakeReceipt(InfoProduct.GetNameProducts(), InfoProduct.GetPriceProducts(), Time, NumberProducts);
+            MakeReceipt(InfoProduct.GetNameProducts(), InfoProduct.GetPriceProducts(), NumberProducts);
         }
 
         public static int HowManyProducts()
@@ -49,20 +48,17 @@ namespace RegistratoreCassa
         public static void MakeReceipt (
             List<string> nameproduct,
             List<float> priceproduct,
-            System.DateTime timenow,
             int numberproduct
             )
         {
-            string PathReceipt = @"D:\Cartella Utente\Desktop\receipt.txt";
+            string PathReceipt = @"D:\receipt.txt";
             using (StreamWriter rw = File.CreateText(PathReceipt))
             {
-                rw.WriteLine(timenow);
                 for(int i = 0; i < numberproduct; i++)
                 {
                     rw.WriteLine(nameproduct[i]);
                     rw.WriteLine(priceproduct[i]);
                 }
-
             }
         }
     }
