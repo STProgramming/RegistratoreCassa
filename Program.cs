@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace RegistratoreCassa
 {
@@ -8,6 +9,7 @@ namespace RegistratoreCassa
     {
         static void Main(string[] args)
         {
+            var Time = DateTime.Now;
             Console.WriteLine("Registratore di cassa esempio");
             Console.WriteLine("a fine registrazione prodotti si creerà un file tipo .txt dove alloggeranno tutti i dati raccolti");
             int NumberProducts = HowManyProducts();
@@ -15,7 +17,7 @@ namespace RegistratoreCassa
             List<float> PriceProducts = new List<float>();
             (NameProducts, PriceProducts) = ProductsSubscription(NumberProducts);
             Product InfoProduct = new Product(NameProducts, PriceProducts);
-            MakeReceipt(InfoProduct.GetNameProducts(), InfoProduct.GetPriceProducts(), NumberProducts);
+            MakeReceipt(InfoProduct.GetNameProducts(), InfoProduct.GetPriceProducts(), NumberProducts, ref Time);
         }
 
         public static int HowManyProducts()
@@ -48,17 +50,30 @@ namespace RegistratoreCassa
         public static void MakeReceipt (
             List<string> nameproduct,
             List<float> priceproduct,
-            int numberproduct
+            int numberproduct,
+            ref DateTime Time
             )
         {
-            string PathReceipt = @"D:\receipt.txt";
-            using (StreamWriter rw = File.CreateText(PathReceipt))
+            float TotalPrice = 0;
+            string PathReceipt = @"D:\receipt.xml";
+            using (XmlWriter writer = XmlWriter.Create(PathReceipt))
             {
-                for(int i = 0; i < numberproduct; i++)
+                writer.WriteStartElement("receipt");
+                writer.WriteElementString("time", Time.ToString());
+                writer.WriteElementString("ID", "123456789");
+                for (int i = 0; i < numberproduct; i++)
                 {
-                    rw.WriteLine(nameproduct[i]);
-                    rw.WriteLine(priceproduct[i]);
+                    writer.WriteStartElement("product");
+                    writer.WriteElementString("name", nameproduct[i]);
+                    writer.WriteElementString("price", priceproduct[i].ToString());
+                    writer.WriteEndElement();
+                    TotalPrice += priceproduct[i];
                 }
+                writer.WriteStartElement("total");
+                writer.WriteElementString("price", TotalPrice.ToString());
+                writer.WriteEndElement();
+                writer.WriteEndElement();
+                writer.Flush();
             }
         }
     }
